@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/features/coins/domain/entity/coin_asset.dart';
 import 'package:test_app/features/coins/domain/state_manager/coins_bloc/coins_asset_bloc.dart';
 import 'package:test_app/features/coins/presentation/widgets/coin_tile_widget.dart';
-import 'package:test_app/features/coins/utils/services/colors_generator_utils.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class CoinsListWidget extends StatefulWidget {
@@ -25,20 +24,9 @@ class CoinsListWidget extends StatefulWidget {
 class _CoinsListWidgetState extends State<CoinsListWidget>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
-  final ColorsGeneratorUtils _colorsGeneratorUtils = ColorsGeneratorUtils();
-  final Map<String, Color> _coinColors = {};
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void didUpdateWidget(CoinsListWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Генерируем цвета для новых монет
-    for (final coin in widget.coinAssets) {
-      _coinColors.putIfAbsent(coin.id, _colorsGeneratorUtils.nextColor);
-    }
-  }
 
   @override
   void dispose() {
@@ -66,7 +54,7 @@ class _CoinsListWidgetState extends State<CoinsListWidget>
           key: ValueKey(coinAsset.id + index.toString()),
           symbol: coinAsset.symbol,
           priceUsd: coinAsset.priceUsd,
-          color: _coinColors[coinAsset.id]!,
+          color: coinAsset.color ?? Colors.redAccent,
         );
       },
     );

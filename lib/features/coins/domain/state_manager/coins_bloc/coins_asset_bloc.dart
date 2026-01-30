@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:test_app/features/coins/domain/entity/coin_asset.dart';
 import 'package:test_app/features/coins/domain/usecase/get_coins_assets_usecase.dart';
+import 'package:test_app/features/coins/utils/services/colors_generator_utils.dart';
 
 part 'coins_asset_event.dart';
 part 'coins_asset_state.dart';
@@ -14,6 +15,7 @@ class CoinsAssetBloc extends Bloc<CoinsAssetEvent, CoinsAssetState> {
   final GetCoinsAssetsUseCase _getCoinsAssetsUseCase;
 
   final int _itemsPerPage = 15;
+  final ColorsGeneratorUtils _colorsGeneratorUtils = ColorsGeneratorUtils();
 
   CoinsAssetBloc(this._getCoinsAssetsUseCase) : super(const _Initial()) {
     on<_Init>(_onInit);
@@ -29,7 +31,7 @@ class CoinsAssetBloc extends Bloc<CoinsAssetEvent, CoinsAssetState> {
       (failure) => emit(
         CoinsAssetState.error(assets: state.assets, message: failure.message),
       ),
-      (assets) => emit(CoinsAssetState.loaded(assets: assets.toSet())),
+      (assets) => _onResultSuccess(assets, emit),
     );
   }
 
@@ -48,8 +50,18 @@ class CoinsAssetBloc extends Bloc<CoinsAssetEvent, CoinsAssetState> {
       (failure) => emit(
         CoinsAssetState.error(assets: state.assets, message: failure.message),
       ),
-      (assets) => emit(
-        CoinsAssetState.loaded(assets: {...state.assets, ...assets}.toSet()),
+      (assets) => _onResultSuccess(assets, emit),
+    );
+  }
+
+  void _onResultSuccess(List<CoinAsset> assets, _Emit emit) {
+    emit(
+      CoinsAssetState.loaded(
+        assets: assets
+            .map(
+              (coin) => coin.copyWith(color: _colorsGeneratorUtils.nextColor()),
+            )
+            .toSet(),
       ),
     );
   }
