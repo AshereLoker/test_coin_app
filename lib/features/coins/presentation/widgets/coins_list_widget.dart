@@ -22,9 +22,23 @@ class CoinsListWidget extends StatefulWidget {
   State<CoinsListWidget> createState() => _CoinsListWidgetState();
 }
 
-class _CoinsListWidgetState extends State<CoinsListWidget> {
+class _CoinsListWidgetState extends State<CoinsListWidget>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
   final ColorsGeneratorUtils _colorsGeneratorUtils = ColorsGeneratorUtils();
+  final Map<String, Color> _coinColors = {};
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void didUpdateWidget(CoinsListWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Генерируем цвета для новых монет
+    for (final coin in widget.coinAssets) {
+      _coinColors.putIfAbsent(coin.id, _colorsGeneratorUtils.nextColor);
+    }
+  }
 
   @override
   void dispose() {
@@ -33,24 +47,28 @@ class _CoinsListWidgetState extends State<CoinsListWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => InfiniteList(
-    scrollController: _scrollController,
-    hasError: widget.hasError,
-    isLoading: widget.isLoading,
-    itemCount: widget.coinAssets.length,
-    cacheExtent: 56,
+  Widget build(BuildContext context) {
+    super.build(context);
 
-    onFetchData: () =>
-        context.read<CoinsAssetBloc>().add(const CoinsAssetEvent.loadMore()),
-    itemBuilder: (context, index) {
-      final coinAsset = widget.coinAssets.elementAt(index);
-      final color = _colorsGeneratorUtils.nextColor();
+    return InfiniteList(
+      scrollController: _scrollController,
+      hasError: widget.hasError,
+      isLoading: widget.isLoading,
+      itemCount: widget.coinAssets.length,
+      cacheExtent: 56,
 
-      return CoinTileWidget(
-        symbol: coinAsset.symbol,
-        priceUsd: coinAsset.priceUsd,
-        color: color,
-      );
-    },
-  );
+      onFetchData: () =>
+          context.read<CoinsAssetBloc>().add(const CoinsAssetEvent.loadMore()),
+      itemBuilder: (context, index) {
+        final coinAsset = widget.coinAssets.elementAt(index);
+
+        return CoinTileWidget(
+          key: ValueKey(coinAsset.id + index.toString()),
+          symbol: coinAsset.symbol,
+          priceUsd: coinAsset.priceUsd,
+          color: _coinColors[coinAsset.id]!,
+        );
+      },
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class CoinAsset extends Equatable {
   final String id;
@@ -6,6 +7,7 @@ class CoinAsset extends Equatable {
   final String name;
   final double priceUsd;
   final int rank;
+  final Color? color;
 
   const CoinAsset({
     required this.id,
@@ -13,6 +15,7 @@ class CoinAsset extends Equatable {
     required this.name,
     required this.priceUsd,
     required this.rank,
+    this.color,
   });
 
   @override

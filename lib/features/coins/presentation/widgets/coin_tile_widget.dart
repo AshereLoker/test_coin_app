@@ -34,6 +34,7 @@ class CoinTileWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         DecoratedBox(
+          key: ValueKey('color_box_$symbol'),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(_Values.colorBoxBorderRadius),
