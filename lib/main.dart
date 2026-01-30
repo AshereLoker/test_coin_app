@@ -25,7 +25,7 @@ Future<CoinsAssetBloc> _initDependencies() async {
   final dio = Dio(
     BaseOptions(
       baseUrl: 'https://rest.coincap.io/v3/',
-      headers: {'Authorization': 'Bearer '},
+      headers: {'Authorization': 'Bearer $apiKey'},
     ),
   );
   dio.interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: true));
